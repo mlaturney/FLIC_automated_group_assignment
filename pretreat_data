@@ -1,0 +1,205 @@
+#set working directory
+setwd("~/Desktop/FLICproject")
+
+#load FLIC required files
+attach("FLICFunctions",pos=2)
+require(ggplot2)
+require(stats)
+
+#set parameters
+p=ParametersClass.SingleWell()
+p=SetParameter(p, Feeding.Interval.Minimum = 10)
+p=SetParameter(p, Feeding.Threshold.Value = 10)
+p=SetParameter(p, Tasting.Threshold.Interval=c(01,02))
+p=SetParameter(p, Feeding.Minevents = 6)
+p=SetParameter(p, Signal.Threshold = 10)
+
+#load DFMs
+dfm<-DFMClass(1,p)
+dfm<-DFMClass(2,p)
+dfm<-DFMClass(3,p)
+dfm<-DFMClass(4,p)
+monitors<-c(1,2,3,4)
+
+
+##look at total drinking time over 6 hours, 30 minute intervals
+#make a feeding summary for all DFMs for desired time range (time in minutes)
+#create a vector representing total drinking time for that time range
+#repeat for each time range
+#NOTE: change location to reflect where your feeding summary.csv file is saved (in yellow) for all lines
+Feeding.Summary.Monitors(monitors,p,range = c(0,30))
+thirtymin<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+thirtymin$totalcontact <- thirtymin$MeanDuration*thirtymin$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,60))
+onehour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+onehour$totalcontact <- onehour$MeanDuration*onehour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,90))
+nintymin<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+nintymin$totalcontact <- nintymin$MeanDuration*nintymin$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,120))
+twohour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+twohour$totalcontact <- twohour$MeanDuration*twohour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,150))
+hundredfifty<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+hundredfifty$totalcontact <- hundredfifty$MeanDuration*hundredfifty$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,180))
+threehour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+threehour$totalcontact <- threehour$MeanDuration*threehour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,210))
+twohundredten<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+twohundredten$totalcontact <- twohundredten$MeanDuration*twohundredten$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,240))
+fourhour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+fourhour$totalcontact <- fourhour$MeanDuration*fourhour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,270))
+twohundredseventy<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+twohundredseventy$totalcontact <- twohundredseventy$MeanDuration*twohundredseventy$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,300))
+fivehour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+fivehour$totalcontact <- fivehour$MeanDuration*fivehour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,330))
+threehundredthirty<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+threehundredthirty$totalcontact <- threehundredthirty$MeanDuration*threehundredthirty$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,360))
+sixhour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+sixhour$totalcontact <- sixhour$MeanDuration*sixhour$Events
+
+#make a data frame with the new vectors you created
+cumulative_contact <- data.frame(thirtymin$totalcontact, onehour$totalcontact, nintymin$totalcontact, twohour$totalcontact, hundredfifty$totalcontact, threehour$totalcontact, twohundredten$totalcontact, fourhour$totalcontact, twohundredseventy$totalcontact, fivehour$totalcontact, threehundredthirty$totalcontact, sixhour$totalcontact)
+
+#put in fly ID here in order (DFM1-1A, DFM1-1B… DFM4-6B), based on group identity number (for example mated = 1, virgin = 2; or genotypes 1, 2, and 3)
+IDraw <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,
+           1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3)
+#creates a column in your data base for IDs
+cumulative_contact$ID <- IDraw
+#reorganizes the columns so that ID is the first column
+cumulative_contact_neworder <- cumulative_contact[, c(13,1,2,3,4,5,6,7,8,9,10,11,12)]
+#sorts the data so that IDs are grouped together in order
+sort.cumulative_contact_neworder <- cumulative_contact_neworder[order(cumulative_contact$ID) , ]
+
+#writes a .csv file for your data frame
+#put in folder location and file name (yellow), cumulative data for all groups
+write.csv(sort.cumulative_contact_neworder,file="/Users/admin/Desktop/FLICproject/nameoffile.csv")
+
+
+
+
+
+
+##to look at first 20 minutes, collects total drinking time, number of events, and mean bout length
+#must record time that the first fly was placed into each DFM. In this example, new DFM was started every 5 minutes (DFM1 at time 0, DFM2 at 5, DFM3 at 10 and DFM4 at 15)
+#make a feeding summary for all DFMs with a unique time range (time in minutes)
+#create a vector representing total drinking time, number of bouts, and mean bout length for that time range
+#change location to reflect where your feeding summary.csv file saves for all lines (yellow)
+Feeding.Summary.Monitors(1, p, range = c(0,20))
+drinking1<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_1.csv", header=TRUE)
+drinking1_total<- drinking1$MeanDuration* drinking1$Events
+drinking1_events<- drinking1$Events
+drinking1_mean<- drinking1$MeanDuration
+Feeding.Summary.Monitors(2, p, range = c(5,25))
+drinking2<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM2_2.csv", header=TRUE)
+drinking2_total <- drinking2$MeanDuration* drinking2$Events
+drinking2_events<- drinking2$Events
+drinking2_mean<- drinking2$MeanDuration
+Feeding.Summary.Monitors(3, p, range = c(10,30))
+drinking3<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM3_3.csv", header=TRUE)
+drinking3_total <- drinking3$MeanDuration* drinking3$Events
+drinking3_events<- drinking3$Events
+drinking3_mean<- drinking3$MeanDuration
+Feeding.Summary.Monitors(4, p, range = c(15,35))
+drinking4<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM4_4.csv", header=TRUE)
+drinking4_total <- drinking4$MeanDuration* drinking4$Events
+drinking4_events<- drinking4$Events
+drinking4_mean<- drinking4$MeanDuration
+
+#make a new vector by appending the drinking times, number of bouts, and mean bout length
+all_drinkingtotal <- c(drinking1_total,drinking2_total,drinking3_total,drinking4_total)
+all_drinkingevents <- c(drinking1_events,drinking2_events,drinking3_events,drinking4_events)
+all_drinkingmean <- c(drinking1_mean,drinking2_mean,drinking3_mean,drinking4_mean)
+
+#put in fly ID here in order (DFM1-1A, DFM1-1B… DFM4-6B), based on group (for example mated = 1, virgin = 2; or genotypes 1, 2, and 3)
+ID <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,
+           1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3)
+
+#make a data frame with all of your vectors
+all_data <- data.frame(ID, all_drinkingtotal, all_drinkingevents, all_drinkingmean)
+#sort that data frame so that groups IDs are together and in order
+sort.all_data <- all_data[order(all_data$ID) , ]
+
+#put in folder location and file name, cumulative data for all groups
+write.csv(sort.all_data,file="/Users/admin/Desktop/FLICproject/nameoffile.csv")
+
+
+
+##when using optogenetics, analyze by the hour, cumulatively for 4 hours, every 60 minutes with DFM1 and DFM2 in green light condition and DFM3 and DFM4 in dark condition
+#make a feeding summary for all DFMs for desired time range (time in minutes)
+#create a vector representing total drinking time for that time range
+#repeat for each time range
+#change location in all lines (yellow) where your .csv files saves
+Feeding.Summary.Monitors(monitors,p,range = c(0,60))
+onehour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+onehour$totalcontact <- onehour$MeanDuration*onehour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,120))
+twohour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+twohour$totalcontact <- twohour$MeanDuration*twohour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,180))
+threehour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+threehour$totalcontact <- threehour$MeanDuration*threehour$Events
+Feeding.Summary.Monitors(monitors,p,range = c(0,240))
+fourhour<-read.csv(file="/Users/admin/Desktop/FLICproject/FeedingSummary_DFM1_4.csv", header=TRUE)
+fourhour$totalcontact <- fourhour$MeanDuration*fourhour$Events
+
+#write the data frame to include the vectors you created
+cumulative_contact <- data.frame(onehour$totalcontact, twohour$totalcontact, threehour$totalcontact, fourhour$totalcontact)
+
+#put in fly ID here in order
+IDraw <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,
+           1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3)
+#DFM1 and DFM2 are green light condition, we modify group number to reflect this
+add_me <- 3
+IDgreenlight <- IDraw[1:24] + add_me
+IDdark <- IDraw[25:48]
+#put the modified IDs into your data frame
+cumulative_contact$ID <- append(IDgreenlight, IDdark)
+#reorganize columns so that IDs are the most left
+cumulative_contact_neworder <- cumulative_contact[, c(5,1,2,3,4)]
+#sort by IDs 
+sort.cumulative_contact <- cumulative_contact_neworder[order(cumulative_contact$ID) , ]
+
+#to find the difference between average_drinking_time_dark_control and each_light_fly (within genotype)
+mean_group1_hour1 <- mean(sort.cumulative_contact$onehour.totalcontact[sort.cumulative_contact$ID==1])
+mean_group2_hour1 <- mean(sort.cumulative_contact$onehour.totalcontact[sort.cumulative_contact$ID==2])
+mean_group3_hour1 <- mean(sort.cumulative_contact$onehour.totalcontact[sort.cumulative_contact$ID==3])
+mean_group1_hour2 <- mean(sort.cumulative_contact$twohour.totalcontact[sort.cumulative_contact$ID==1])
+mean_group2_hour2 <- mean(sort.cumulative_contact$twohour.totalcontact[sort.cumulative_contact$ID==2])
+mean_group3_hour2 <- mean(sort.cumulative_contact$twohour.totalcontact[sort.cumulative_contact$ID==3])
+mean_group1_hour3 <- mean(sort.cumulative_contact$threehour.totalcontact[sort.cumulative_contact$ID==1])
+mean_group2_hour3 <- mean(sort.cumulative_contact$threehour.totalcontact[sort.cumulative_contact$ID==2])
+mean_group3_hour3 <- mean(sort.cumulative_contact$threehour.totalcontact[sort.cumulative_contact$ID==3])
+mean_group1_hour4 <- mean(sort.cumulative_contact$fourhour.totalcontact[sort.cumulative_contact$ID==1])
+mean_group2_hour4 <- mean(sort.cumulative_contact$fourhour.totalcontact[sort.cumulative_contact$ID==2])
+mean_group3_hour4 <- mean(sort.cumulative_contact$fourhour.totalcontact[sort.cumulative_contact$ID==3])
+
+sort.cumulative_contact$onehour.standardized_contact <- ifelse(sort.cumulative_contact$ID == 4, sort.cumulative_contact$onehour.totalcontact-mean_group1_hour1,
+                                                                ifelse(sort.cumulative_contact$ID == 5, sort.cumulative_contact$onehour.totalcontact-mean_group2_hour1,
+                                                                       ifelse(sort.cumulative_contact$ID == 6, sort.cumulative_contact$onehour.totalcontact-mean_group3_hour1,
+                                                                              0)))
+sort.cumulative_contact$twohour.standardized_contact <- ifelse(sort.cumulative_contact$ID == 4, sort.cumulative_contact$twohour.totalcontact-mean_group1_hour2,
+                                                                ifelse(sort.cumulative_contact$ID == 5, sort.cumulative_contact$twohour.totalcontact-mean_group2_hour2,
+                                                                       ifelse(sort.cumulative_contact$ID == 6, sort.cumulative_contact$twohour.totalcontact-mean_group3_hour2,
+                                                                              0)))
+sort.cumulative_contact$threehour.standardized_contact <- ifelse(sort.cumulative_contact$ID == 4, sort.cumulative_contact$threehour.totalcontact-mean_group1_hour3,
+                                                                ifelse(sort.cumulative_contact$ID == 5, sort.cumulative_contact$threehour.totalcontact-mean_group2_hour3,
+                                                                       ifelse(sort.cumulative_contact$ID == 6, sort.cumulative_contact$threehour.totalcontact-mean_group3_hour3,
+                                                                              0)))
+sort.cumulative_contact$fourhour.standardized_contact <- ifelse(sort.cumulative_contact$ID == 4, sort.cumulative_contact$fourhour.totalcontact-mean_group1_hour4,
+                                                                ifelse(sort.cumulative_contact$ID == 5, sort.cumulative_contact$fourhour.totalcontact-mean_group2_hour4,
+                                                                       ifelse(sort.cumulative_contact$ID == 6, sort.cumulative_contact$fourhour.totalcontact-mean_group3_hour4,
+                                                                              0)))
+
+#creates and transposes data frame so that easier to paste into Prism
+transpose.cumulative_contact <- as.data.frame(t(as.matrix(sort.cumulative_contact)))
+
+#put in folder location and file name
+write.csv(transpose.cumulative_contact,file="/Users/admin/Desktop/FLICproject/nameoffile.csv")
+
