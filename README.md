@@ -1,4 +1,4 @@
-# Using the fly liquid interaction counter (FLIC) to recording feeding behavior
+# Using the fly liquid interaction counter (FLIC) to record feeding behavior in Drosophila melanogaster
 
 ## Summary
 
